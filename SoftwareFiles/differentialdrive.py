@@ -42,60 +42,8 @@ class DifferentialDrive:
         self.left.stop_step(self.left_pins)
         self.right.stop_step(self.right_pins)
 
-# Assignment 1
-    async def move_forward(self, steps, step_sequence, delay = 0.01, direction = 1, decay = 0):
-        '''
-        This function is used to move the stepper.
-        It loops through the range of the steps and then uses the set_duty function to
-        change the duty for each pin with the sequence as argument.
 
-        :param steps: Number of steps.
-        :type steps: int
-
-        :param step_sequence: The sequence of the steps.
-        :type step_sequence: List, matrix
-
-        :param delay: The delay every time we take a step. Default value 0.001 seconds
-        :type delay: float or int
-
-        :param direction: Direction of the stepper. 1 for clockwise, -1 for counterclockwise
-        :type direction: int
-
-        :param decay: The decay value to decrease the delay over time.
-        :type decay: float or int
-        '''
-
-        for _ in range(steps):
-            for sequence in step_sequence[::direction]:
-                self.left.set_duty(self.left_pins, sequence)
-                self.right.set_duty(self.right_pins, sequence)
-                if delay > 0.01:
-                    delay -= decay
-                await uasyncio.sleep(delay)
-        self.stop()
-
-# Assignemt 2
-    async def move_distance(self, cm, delay = 0.01, direction = 1):
-        '''
-        This function is used to move the stepper a given distance.
-        It calculate how many steps is needed to move a given distance:
-          step=cm/(cm/step)
-
-        :param cm: The length the robot should go
-        :type cm: float
-
-        :param delay: The delay every time we take a step. Default value 0.001 seconds
-        :type delay: float or int
-
-        :param direction: Direction of the stepper. 1 for clockwise, -1 for counterclockwise
-        :type direction: int
-        '''
-        number_of_steps=int(cm/self.distance_per_step)
-        await self.move_forward(number_of_steps, self.left.half_step(), delay, direction)
-
-
-# Assignment 3
-    async def turn(self, steps, step_sequence, turning_direction, delay = 0.01, direction = 1):
+    async def turn_onewheel(self, steps, step_sequence, turning_direction, delay = 0.01, direction = 1):
 
         '''
         This function moves the robot either left or right. It will only move one motor.
@@ -134,6 +82,48 @@ class DifferentialDrive:
 
         self.stop()
 
+    async def move_forward(self, steps, step_sequence, delay = 0.01, direction = 1, decay = 0):
+        '''
+        This function is used to move the stepper.
+        It loops through the range of the steps and then uses the set_duty function to
+        change the duty for each pin with the sequence as argument.
+
+        :param steps: Number of steps.
+        :type steps: int
+
+        :param step_sequence: The sequence of the steps.
+        :type step_sequence: List, matrix
+
+        :param delay: The delay every time we take a step. Default value 0.001 seconds
+        :type delay: float or int
+
+        :param direction: Direction of the stepper. 1 for clockwise, -1 for counterclockwise
+        :type direction: int
+
+        :param decay: The decay value to decrease the delay over time.
+        :type decay: float or int
+        '''
+
+        await uasyncio.gather(self.turn_onewheel(steps, step_sequence, "right", delay, direction), self.turn_onewheel(steps, step_sequence, "left", delay, direction))
+
+    async def move_distance(self, cm, delay = 0.01, direction = 1):
+        '''
+        This function is used to move the stepper a given distance.
+        It calculate how many steps is needed to move a given distance:
+          step=cm/(cm/step)
+
+        :param cm: The length the robot should go
+        :type cm: float
+
+        :param delay: The delay every time we take a step. Default value 0.001 seconds
+        :type delay: float or int
+
+        :param direction: Direction of the stepper. 1 for clockwise, -1 for counterclockwise
+        :type direction: int
+        '''
+        number_of_steps=int(cm/self.distance_per_step)
+        await self.move_forward(number_of_steps, self.left.half_step(), delay, direction)
+
     async def turn_degree(self, degree, step_sequence, turning_direction, delay = 0.01, direction = 1):
         '''
         This function moves the robot either left or right in a certain degree. It will only move one motor.
@@ -160,8 +150,7 @@ class DifferentialDrive:
         full_turn_steps = turning_circumference/self.distance_per_step
         steps_turn_degree = abs(full_turn_steps/(360/degree))
 
-        await self.turn(steps_turn_degree, step_sequence, turning_direction, direction = direction, delay = delay)
-
+        await self.turn_onewheel(steps_turn_degree, step_sequence, turning_direction, direction = direction, delay = delay)
 
     async def turn_in_place(self, steps, step_sequence, turning_direction, delay = 0.01, direction = -1):
 
