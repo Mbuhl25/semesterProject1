@@ -15,3 +15,5 @@ EM_pwm.freq(EM_frequency)
 pwm.duty_u16(int(pwm_pct*pwm_max))
 
 # Mbuhl25
+
+print("HELP")
