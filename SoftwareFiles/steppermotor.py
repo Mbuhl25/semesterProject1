@@ -1,11 +1,10 @@
 #steppermotor
-from time import sleep
 import math
 from machine import Pin, PWM
 
 
 class StepperMotor:
-    def __init__(self, pins, pwm_pct = 0.9, frequency=18_000):
+    def __init__(self, pins, pwm_pct = 0.2, frequency=18000):
         """
         Initialize a StepperMotor object.
 
@@ -17,8 +16,10 @@ class StepperMotor:
         self.pwm_pct = pwm_pct
         self.frequency = frequency
         self.pwm_max = 65535
-
-
+    
+    def adjustPwm(self, new_pwm):
+        self.pwm_pct = new_pwm
+        
 
     def initialize_pins(self):
         '''
@@ -52,7 +53,23 @@ class StepperMotor:
         stop_sequence = [0, 0, 0, 0]
         self.set_duty(pins,stop_sequence)
 
+    def full_step(self):
+        '''
+        This function creates a step sequence for the half step.
+        Returns the step sequence
 
+        '''
+        duty_procentage = self.get_duty()
+
+        step_sequence = [
+            [duty_procentage,0,0,0],
+            [0,duty_procentage,0,0],
+            [0,0,duty_procentage,0],
+            [0,0,0,duty_procentage]
+        ]
+        return step_sequence
+    
+    
     def half_step(self):
         '''
         This function creates a step sequence for the half step.
