@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     pControl = pController()
     sensor1 = Sensor()
-    sensorLookup = 0
+    sensorTimout = 0
     #print("calibrating min")
     #sleep(2)
     #min_sensor = sensor1.calibrate()
@@ -38,12 +38,15 @@ if __name__ == "__main__":
     #sleep(5)
     #max_sensor = sensor1.calibrate()
     new_step_left, new_step_right = pControl.adjustStep(0.5, sensor1.runSensor())
+    sensorVal = 10
     while True:
-        sensorLookup+=1
-        #sensorVal = int(pControl.adjustSpeed(new_step_left, new_step_right))
-        if sensorLookup%10 ==0:
+        sensorTimout+=1
+        sensorVal = int(pControl.adjustSpeed(new_step_left, new_step_right))
+        
+        print(sensorVal)
+        if sensorTimout > sensorVal:
             new_step_left, new_step_right = pControl.adjustStep(0.5, sensor1.runSensor())
-            sensorLookup = 0
+            sensorTimout = 0
          
         #new_step_left, new_step_right = 0.5, 0.5
        

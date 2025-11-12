@@ -35,16 +35,12 @@ class pController():
         return new_step_left, new_step_right
     
     def adjustSpeed(self, new_step_left, new_step_right):
-        max_delay = 40
+        max_delay = 60
         min_delay = 1
         constant = max_delay - min_delay
         diff = abs(new_step_left - new_step_right)
 
-        # Normaliser diff til [0, 1] ved at antage en maksimal forskel
-        max_diff = 1  # justér denne værdi efter hvor stor diff kan blive i praksis
-
-        normalized_diff = min(diff / max_diff, 1.0)  # sørger for at det ikke går over 1
-        new_delay = min_delay + constant * normalized_diff
+        new_delay = max_delay - constant * diff
         new_delay = max(min_delay, min(max_delay, new_delay))  # clamp til intervallet
         return new_delay
     
