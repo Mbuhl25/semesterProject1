@@ -39,13 +39,16 @@ class Drive:
     def adjustRightPwm(self, new_pwm):
         self.right.adjustPwm(new_pwmSS)
         
-    def stop(self):
+    def stop(self, side):
         '''
         This function sets the stepper sequence on each motor to be:
         [0,0,0,0]
         '''
-        self.left.stop_step(self.left_pins)
-        self.right.stop_step(self.right_pins)
+        if side == "left":
+            self.left.stop_step(self.left_pins)
+        if side == "right":
+            self.right.stop_step(self.right_pins)
+        
 
     def turnLeftWheel(self, direction = 1):
 
@@ -76,4 +79,3 @@ class Drive:
     def turnRightWheel(self, direction = 1):
         self.right.set_duty(self.right_pins, self.seq[self.right_seq_index])
         self.right_seq_index = (self.right_seq_index + direction) % len(self.seq)
-        

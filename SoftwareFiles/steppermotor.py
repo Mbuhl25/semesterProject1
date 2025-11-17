@@ -81,7 +81,13 @@ class StepperMotor:
             [duty_procentage,0,0,duty_procentage]
         ]
         return step_sequence
-
+    
+    def stop_step(self, pins):
+        '''
+        This function is used to stop the steppermotor. The PWM is equal to zero.
+        '''
+        stop_sequence = [0, 0, 0, 0]
+        self.set_duty(pins,stop_sequence)
 
     def set_duty(self, pins, sequence):
         '''
