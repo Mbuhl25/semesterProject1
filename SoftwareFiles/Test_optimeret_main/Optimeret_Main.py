@@ -47,9 +47,9 @@ class Sensor():
 
 
 class pController():
-    def __init__(self, kp = 0.8):
+    def __init__(self, kp = 0.4):
         self.positions = [-3, -2, -1, 1, 2, 3]
-        self.weights = [1, 1, 1, 1, 1, 1]
+        self.weights = [6, 2, 1, 1, 2, 6]
         self.kp = kp
     
     def weightedSum(self, listSensor):
@@ -83,14 +83,16 @@ class pController():
         control = self.findControl(listSensor)
         new_step_left = base_step+control
         new_step_right = base_step-control
-        new_step_left = max(0, min(1, new_step_left))
-        new_step_right = max(0, min(1, new_step_right))
+        new_step_left = max(0, min(base_step, new_step_left))
+        new_step_right = max(0, min(base_step, new_step_right))
         return new_step_left, new_step_right
     
     def adjustSpeed(self, new_step_left, new_step_right):
-        max_delay = 40
-        min_delay = 1
+        max_delay = 60
+        min_delay = 5
         constant = max_delay - min_delay
+        #print(f"right{new_step_right}")
+        #print(f"left{new_step_left}")
         diff = abs(new_step_left - new_step_right)
 
         new_delay = max_delay - constant * diff
@@ -100,10 +102,19 @@ class pController():
     def adjustPwmPct(self, new_delay):
         max_pwm = 0.6
         min_pwm = 0.3
-        constant = 4
-        new_pwm = max_pwm-new_delay*constant
-        new_pwm = max(min_pwm, min(max_pwm, new_pwm)) #We are clamping the new_pwm
-        return new_pwm
+
+        max_delay = 30
+        min_delay = 5
+
+        # Normaliser delay til 0..1
+        scale = (new_delay - min_delay) / (max_delay - min_delay)
+
+        # Map delay -> pwm (omvendt)
+        new_pwm = max_pwm - (1 - scale) * (max_pwm - min_pwm)
+
+        # Clamp
+        return max(min_pwm, min(max_pwm, new_pwm))
+
     
     
 class StepperMotor:
@@ -125,9 +136,6 @@ class StepperMotor:
         self.left_seq_index = 0
         self.right_seq_index = 0
 
-        # Default step type
-        self.seq = self.half_step()
-
     def adjustPwm(self, new_pwm):
         self.pwm_pct = new_pwm
 
@@ -146,18 +154,13 @@ class StepperMotor:
         stop_seq = [0, 0, 0, 0]
         self.set_duty(pwm_list, stop_seq)
 
-    def full_step(self):
-        d = self.get_duty()
-        return [
-            [d,0,0,0],
-            [0,d,0,0],
-            [0,0,d,0],
-            [0,0,0,d],
-        ]
+    def set_duty(self, pwm_list, seq):
+        for i, pwm_pin in enumerate(pwm_list):
+            pwm_pin.duty_u16(seq[i])
 
-    def half_step(self):
+    def turnLeftWheel(self, direction=1):
         d = self.get_duty()
-        return [
+        seq = [
             [d,0,0,0],
             [d,d,0,0],
             [0,d,0,0],
@@ -165,27 +168,29 @@ class StepperMotor:
             [0,0,d,0],
             [0,0,d,d],
             [0,0,0,d],
-            [d,0,0,d],
-        ]
-
-    def set_duty(self, pwm_list, seq):
-        for i, pwm_pin in enumerate(pwm_list):
-            pwm_pin.duty_u16(seq[i])
-
-    def turnLeftWheel(self, direction=1):
-        seq = self.seq[self.left_seq_index]
+            [d,0,0,d]
+        ][self.left_seq_index]
         self.set_duty(self.left_pins, seq)
-        self.left_seq_index = (self.left_seq_index + direction) % len(self.seq)
+        self.left_seq_index = (self.left_seq_index + direction) % 8
 
     def turnRightWheel(self, direction=1):
-        seq = self.seq[self.right_seq_index]
+        d = self.get_duty()
+        seq = [
+            [d,0,0,0],
+            [d,d,0,0],
+            [0,d,0,0],
+            [0,d,d,0],
+            [0,0,d,0],
+            [0,0,d,d],
+            [0,0,0,d],
+            [d,0,0,d]][self.right_seq_index]
         self.set_duty(self.right_pins, seq)
-        self.right_seq_index = (self.right_seq_index + direction) % len(self.seq)
+        self.right_seq_index = (self.right_seq_index + direction) % 8
 
 if __name__ == "__main__":
 
     # Variable to change the pwm percentage from the main file
-    pwm_procent=0.5
+    pwm_procent=0.4
     delay_val_1 = 0.0001
 
     # Initializes the right and left motor pins, and initializes the stepper
@@ -204,25 +209,29 @@ if __name__ == "__main__":
     #sleep(5)
     #max_sensor = sensor1.calibrate()
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorVal = 10
+    sensorDelay = 10
     while True:
         sensorTimout+=1
         
         #print(sensorVal)
-        if sensorTimout > sensorVal:
-            sensorVal = int(pControl.adjustSpeed(new_step_left, new_step_right))
+        if sensorTimout > sensorDelay:
+            sensorDelay = int(pControl.adjustSpeed(new_step_left, new_step_right))
+            new_pwm = round(float(pControl.adjustPwmPct(sensorDelay)),1)
+            stepper.adjustPwm(new_pwm)
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
             sensorTimout = 0
+            #print(new_pwm)
+            #print(sensorDelay)
+            #sleep(0.01)
             
-         
-        #new_step_left, new_step_right = 0.5, 0.5
        
         acc_left += new_step_left
         acc_right += new_step_right
         
+    
         if acc_left >=1:
             stepper.turnLeftWheel()
             acc_left -= 1
         if acc_right >= 1:
             stepper.turnRightWheel()
-            acc_right -=1
+            acc_right -=1 
