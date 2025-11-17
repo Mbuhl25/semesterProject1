@@ -45,14 +45,6 @@ class StepperMotor:
         '''
         return int(self.pwm_max * self.pwm_pct)
 
-
-    def stop_step(self, pins):
-        '''
-        This function is used to stop the steppermotor. The PWM is equal to zero.
-        '''
-        stop_sequence = [0, 0, 0, 0]
-        self.set_duty(pins,stop_sequence)
-
     def full_step(self):
         '''
         This function creates a step sequence for the half step.

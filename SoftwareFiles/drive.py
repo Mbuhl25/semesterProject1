@@ -28,13 +28,9 @@ class Drive:
 
         self.left_pins = left.initialize_pins()
         self.right_pins = right.initialize_pins()
-
-        self.distance_per_step = wheel_circumference/steps_per_revolution
-        self.wheelbase = wheelbase
         
         self.left_seq_index = 0
         self.right_seq_index = 0
-        self.both_seq_index = 0
         self.seq = left.half_step()
     
     def adjustLeftPwm(self, new_pwm):

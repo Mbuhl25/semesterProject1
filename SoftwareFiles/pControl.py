@@ -3,12 +3,21 @@ from sensor import Sensor
 
 
 class pController():
-    def __init__(self, kp = 0.4):
+    def __init__(self, kp = 0.2):
         self.positions = [-3, -2, -1, 1, 2, 3]
         self.weights = [1, 1, 1, 1, 1, 1]
         self.kp = kp
     
     def weightedSum(self, listSensor):
+        """
+        This function is giving each sensor a position and a weight.
+        
+        :Param listSensor: The sensor inputs
+        :Type listSensor: List
+        
+        :Return: A list with the weighted position for each sum.
+        
+        """
         weightedSum = 0
         for index, value in enumerate(listSensor):
             weightedSum += value*self.positions[index]*self.weights[index]
@@ -35,9 +44,9 @@ class pController():
         return new_step_left, new_step_right
     
     def adjustSpeed(self, new_step_left, new_step_right):
-        max_delay = 60
-        min_delay = 1
-        constant = max_delay - min_delay
+        max_delay = 40
+        min_delay = 7
+        constant = max_delay*100 - min_delay*100
         diff = abs(new_step_left - new_step_right)
 
         new_delay = max_delay - constant * diff
