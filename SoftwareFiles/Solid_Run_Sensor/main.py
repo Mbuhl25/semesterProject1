@@ -202,6 +202,7 @@ class StepperMotor:
         d = self.get_duty()
         seq = [
                [d,0,0,0],
+               [d,d,0,0],
                [0,d,0,0],
                [0,d,d,0],
                [0,0,d,0],
@@ -219,7 +220,7 @@ class StepperMotor:
         d = self.get_duty()
         seq = self.half_seq[self.left_seq_index]
         self.set_duty(self.left_pins, seq)
-        self.left_seq_index = (self.left_seq_index + direction) % 7
+        self.left_seq_index = (self.left_seq_index + direction) % 8
 
     def turnRightWheel(self, direction=1):
         '''
@@ -230,7 +231,7 @@ class StepperMotor:
         d = self.get_duty()
         seq = self.half_seq[self.right_seq_index]
         self.set_duty(self.right_pins, seq)
-        self.right_seq_index = (self.right_seq_index + direction) % 7
+        self.right_seq_index = (self.right_seq_index + direction) % 8
 
 if __name__ == "__main__":
 
@@ -251,16 +252,12 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 1
+    sensorDelay = 2
     while True:
         sensorTimout+=1
         
-        #print(sensorVal)
         if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-            #print(f"right {new_step_right}")
-            #print(f" left {new_step_left} ")
-            #sleep_us(40)
             sensorTimout = 0
             
        
