@@ -41,10 +41,16 @@ if __name__ == "__main__":
     sensorVal = 10
     while True:
         sensorTimout+=1
-        sensorVal = int(pControl.adjustSpeed(new_step_left, new_step_right))
+        #sensorVal = int(pControl.adjustSpeed(new_step_left, new_step_right))
         
-        print(sensorVal)
-        if sensorTimout > sensorVal:
+        if new_step_left-new_step_right> 0.3:
+            sensorVal = 5
+        else:
+            sensorVal = 20
+            
+            
+        #print(sensorVal)
+        if sensorTimout > 1:
             new_step_left, new_step_right = pControl.adjustStep(0.5, sensor1.runSensor())
             sensorTimout = 0
          
