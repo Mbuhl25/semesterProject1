@@ -254,25 +254,30 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 1000
-    gc.disable()
+    sensorDelay = 6
+    #gc.disable()
+    gc.enable()
     while True:
         sensorTimout+=1
         
-        
-        '''if sensorTimout > sensorDelay:
+
+        if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
             sensorTimout = 0
-            print("hej")'''
             
-       
+            
+    
         acc_left += new_step_left
         acc_right += new_step_right
         
         
-        stepper.turnLeftWheel()
-            
-        stepper.turnRightWheel()
+        if acc_left >=1:
+            stepper.turnLeftWheel()
+            acc_left -= 1
+        if acc_right >= 1:
+            stepper.turnRightWheel()
+            acc_right -=1 
 
         
          
+
