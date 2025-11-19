@@ -2,7 +2,8 @@
 #importing necessary libaries
 from machine import Pin, ADC, PWM
 from time import sleep_us
-
+import _thread
+import gc
 
 
 #Sensor class
@@ -12,6 +13,9 @@ class Sensor():
         self.z1 = Pin(z1,Pin.OUT)
         self.z2 = Pin(z2, Pin.OUT)
         self.adc_input = ADC(Pin(a0))
+        self.current_adc_list = []
+        self.adc_value = 0
+        self.weightedSum = 0
         
         #Sensor sequence from left to right sensor
         self.sensor = [(1,0,1),
@@ -23,14 +27,6 @@ class Sensor():
                        (1,1,1),
                        (0,1,1)]
  
-    def readAdc(self):
-        '''
-        This function is used to measure the adc value
-        
-        :return adcValue: The adc value over self.adc_input
-        '''
-        adcValue = self.adc_input.read_u16()
-        return adcValue
         
     def zSetValue(self,row):
         '''
@@ -49,12 +45,12 @@ class Sensor():
         
         :return current_adc_list: A list containing the sensor values.
         '''
-        current_adc_list = []
+        self.current_adc_list = []
         for number_Z_List in range(len(self.sensor)):
             self.zSetValue(number_Z_List)
-            adc_value = self.readAdc()
-            current_adc_list.append(adc_value)
-        return current_adc_list
+            self.adc_value = self.adc_input.read_u16()
+            self.current_adc_list.append(self.adc_value)
+        return self.current_adc_list
 
 
 class pController():
@@ -68,6 +64,9 @@ class pController():
         
         #The P constant for P control
         self.kp = kp
+        
+        self.control = 0
+        self.weightSum = 0
     
     def weightedSum(self, current_adc_list):
         """
@@ -79,15 +78,15 @@ class pController():
         :Return: A list with the weighted position for each sum.
         
         """
-        weightedSum = 0
+        self.weightSum = 0
         
         #Sums the list of adc with each position and weight.
         for index, value in enumerate(current_adc_list):
-            weightedSum += value*self.positions[index]*self.weights[index]
-        weightedSum= weightedSum/sum(current_adc_list)
+            self.weightSum += value*self.positions[index]*self.weights[index]
+        self.weightSum= self.weightSum/sum(current_adc_list)
         
         #Returns the weighted sum.
-        return weightedSum
+        return self.weightSum
     
     def findError(self,current_adc_list):
         '''
@@ -120,9 +119,9 @@ class pController():
         :return new_step_left: How many steps the left motor should make
         :return new_step_right: How many steps the right motor should make
         '''
-        control = self.findControl(current_adc_list)
-        new_step_left = base_step+control
-        new_step_right = base_step-control
+        self.control = self.findControl(current_adc_list)
+        new_step_left = base_step+self.control
+        new_step_right = base_step-self.control
         new_step_left = max(0, min(base_step, new_step_left))
         new_step_right = max(0, min(base_step,new_step_right))
         return new_step_left, new_step_right  
@@ -208,19 +207,20 @@ class StepperMotor:
                [0,0,d,0],
                [0,0,d,d],
                [0,0,0,d],
-               [d,0,0,d]]
+               [d,0,0,d],
+               ]
         return seq
-
+    
+    
 
     def turnLeftWheel(self, direction=1):
         '''
         Uses this function to turn the left wheel with the given sequence.
         We only move one step of the sequence and saves the index we got to.
         '''
-        d = self.get_duty()
-        seq = self.half_seq[self.left_seq_index]
-        self.set_duty(self.left_pins, seq)
-        self.left_seq_index = (self.left_seq_index + direction) % 8
+    
+        self.set_duty(self.left_pins, self.half_seq[self.left_seq_index])
+        self.left_seq_index = (self.left_seq_index + direction) % len(self.half_seq)
 
     def turnRightWheel(self, direction=1):
         '''
@@ -228,15 +228,16 @@ class StepperMotor:
         We only move one step of the sequence and saves the index we got to.
         
         '''
-        d = self.get_duty()
-        seq = self.half_seq[self.right_seq_index]
-        self.set_duty(self.right_pins, seq)
-        self.right_seq_index = (self.right_seq_index + direction) % 8
+        #sleep_us(100)
+        
+        self.set_duty(self.right_pins, self.half_seq[self.right_seq_index])
+        self.right_seq_index = (self.right_seq_index + direction) % len(self.half_seq)
 
 if __name__ == "__main__":
-
+    
+    
     # Variable to change the pwm percentage from the main file
-    pwm_procent=0.4
+    pwm_procent=0.6
 
     # Initializes the right and left motor pins, and initializes the stepper
     stepper = StepperMotor([0,1,2,3],[4,5,6,7], pwm_procent)
@@ -247,27 +248,31 @@ if __name__ == "__main__":
     #Initialize the pController and Sensor
     pControl = pController()
     sensor1 = Sensor()
+
     
     #sensorTimeout 
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 2
+    sensorDelay = 1000
+    gc.disable()
     while True:
         sensorTimout+=1
         
-        if sensorTimout > sensorDelay:
+        
+        '''if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
             sensorTimout = 0
+            print("hej")'''
             
        
         acc_left += new_step_left
         acc_right += new_step_right
         
         
-        if acc_left >=1:
-            stepper.turnLeftWheel()
-            acc_left -= 1
-        if acc_right >= 1:
-            stepper.turnRightWheel()
-            acc_right -=1 
+        stepper.turnLeftWheel()
+            
+        stepper.turnRightWheel()
+
+        
+         

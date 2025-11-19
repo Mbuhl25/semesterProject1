@@ -217,7 +217,7 @@ class StepperMotor:
         Uses this function to turn the left wheel with the given sequence.
         We only move one step of the sequence and saves the index we got to.
         '''
-        d = self.get_duty()
+
         seq = self.half_seq[self.left_seq_index]
         self.set_duty(self.left_pins, seq)
         self.left_seq_index = (self.left_seq_index + direction) % 8
@@ -228,7 +228,6 @@ class StepperMotor:
         We only move one step of the sequence and saves the index we got to.
         
         '''
-        d = self.get_duty()
         seq = self.half_seq[self.right_seq_index]
         self.set_duty(self.right_pins, seq)
         self.right_seq_index = (self.right_seq_index + direction) % 8
@@ -236,7 +235,7 @@ class StepperMotor:
 if __name__ == "__main__":
 
     # Variable to change the pwm percentage from the main file
-    pwm_procent=0.4
+    pwm_procent=0.6
 
     # Initializes the right and left motor pins, and initializes the stepper
     stepper = StepperMotor([0,1,2,3],[4,5,6,7], pwm_procent)
@@ -252,9 +251,10 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 2
+    sensorDelay = 10
     while True:
         sensorTimout+=1
+        
         
         if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
@@ -270,4 +270,5 @@ if __name__ == "__main__":
             acc_left -= 1
         if acc_right >= 1:
             stepper.turnRightWheel()
-            acc_right -=1 
+            acc_right -=1
+        sleep_us(100)
