@@ -54,13 +54,13 @@ class Sensor():
 
 
 class pController():
-    def __init__(self, kp = 2.0):
+    def __init__(self, kp = 1.0):
         
         #The position of each sensor
         self.positions = [-4,-3, -2, -1, 1, 2, 3,4]
         
         #The wegiht of each sensor. 
-        self.weights = [1, 1, 1, 1, 1, 1, 1,1]
+        self.weights = [3, 1, 1, 1, 1, 1, 1, 3]
         
         #The P constant for P control
         self.kp = kp
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 6
+    sensorDelay = 100
     #gc.disable()
     gc.enable()
     while True:
