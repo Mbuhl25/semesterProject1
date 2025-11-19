@@ -190,7 +190,7 @@ class StepperMotor:
 if __name__ == "__main__":
 
     # Variable to change the pwm percentage from the main file
-    pwm_procent=0.4
+    pwm_procent=0.25
     delay_val_1 = 0.0001
 
     # Initializes the right and left motor pins, and initializes the stepper
@@ -213,7 +213,7 @@ if __name__ == "__main__":
     while True:
         sensorTimout+=1
         
-        #print(sensorVal)
+        '''#print(sensorVal)
         if sensorTimout > sensorDelay:
             sensorDelay = int(pControl.adjustSpeed(new_step_left, new_step_right))
             new_pwm = round(float(pControl.adjustPwmPct(sensorDelay)),1)
@@ -222,16 +222,16 @@ if __name__ == "__main__":
             sensorTimout = 0
             #print(new_pwm)
             #print(sensorDelay)
-            #sleep(0.01)
+            #sleep(0.01)'''
             
        
-        acc_left += new_step_left
-        acc_right += new_step_right
+        acc_left += 1
+        acc_right += 1
         
     
-        if acc_left >=1:
+        if acc_left >=1.0:
             stepper.turnLeftWheel()
-            acc_left -= 1
-        if acc_right >= 1:
+            acc_left -= 1.0
+        if acc_right >= 1.0:
             stepper.turnRightWheel()
-            acc_right -=1 
+            acc_right -=1.0
