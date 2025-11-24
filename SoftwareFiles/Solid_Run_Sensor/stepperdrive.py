@@ -85,7 +85,15 @@ class StepperDrive:
                ]
         return seq
     
-    
+    def stop(self, side):
+        '''
+        This function sets the stepper sequence on each motor to be:
+        [0,0,0,0]
+        '''
+        if side == "left":
+            self.left.stop_step(self.left_pins)
+        if side == "right":
+            self.right.stop_step(self.right_pins)
 
     def turnLeftWheel(self, direction=1):
         '''
@@ -106,3 +114,4 @@ class StepperDrive:
         
         self.set_duty(self.right_pins, self.half_seq[self.right_seq_index])
         self.right_seq_index = (self.right_seq_index + direction) % len(self.half_seq)
+
