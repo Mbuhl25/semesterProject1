@@ -51,5 +51,4 @@ if __name__ == "__main__":
             stepper.turnRightWheel(-1)
             acc_right += 1
         
-        sleep_us(100)
-        
+        sleep_us(50)

@@ -1,60 +1,48 @@
 from machine import ADC, Pin, SoftI2C, UART
-import ssd1306
 from time import sleep_us
-import sys
+import ssd1306, sys
+
+#Variables for the script
+delay_val_1 = 5000
+minLimitValue = 0.025
+
 # Joystick connected to:
 #  - X axis → GP26 (ADC0)
 #  - Y axis → GP27 (ADC1)
 #  - VCC → 3.3V
 #  - GND → GND
-
 x_axis = ADC(Pin(26))  # ADC0
 y_axis = ADC(Pin(27))  # ADC1
 
-delay_val_1 = 250000
-minLimitValue = 0.05
-xminlimitvalue = -0.15
-
-#kill switch
+# Initialize the button-kill switch
 kill = Pin(15, Pin.IN, Pin.PULL_UP)
+#Initialize the 2 Uart pins
 uart = UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1)) # TX on GPIO 1, RX on GPIO 2
 
 
-# oled skærm initializing
+# initialize oled skærm 
 i2c = SoftI2C(scl=Pin(3), sda=Pin(2),freq=100000)
-print("device",i2c.scan())
+print("device has number",i2c.scan())
 oled = ssd1306.SSD1306_I2C(128,64,i2c)
-oled.fill(0)
-oled.text("Friend!",0,0)
-oled.show()
 
 def check_Kill():
     if kill.value() == 0:
+        uart.write("0,0") # Send message to the receiver
         print("Killed")
         sys.exit()
 
 def Get_Motor_Values(x_val, y_val):
-    motor1 = 0
-    motor2 = 0
+    motor_left = round(2*(x_val/65535)-1,  2)
+    motor_right = round(2*(y_val/65535)-1,  2)
 
-    x_val=(x_val)/(65535)*2-1
-    y_val=(y_val)/(65535)*2-1
-    motor1 = y_val
-    motor2 = y_val
-
-    if x_val > 0:
-        motor1 += abs(x_val)
-
-    if x_val < 0:
-        motor2 += abs(x_val)
+    if abs(motor_left) < minLimitValue:
+        motor_left = 0
+    if abs(motor_right) < minLimitValue:
+        motor_right = 0
     
-    if abs(motor1) < minLimitValue:
-        motor1 = 0
-
-    if abs(motor2) < minLimitValue:
-        motor2 = 0
     
-    return motor1, motor2
+    
+    return motor_left, motor_right
     
 print("Joystick test started. Move the stick!")
 
@@ -65,12 +53,16 @@ while True:
     x_val = x_axis.read_u16()
     y_val = y_axis.read_u16()
     
-    motor1, motor2 = Get_Motor_Values(x_val, y_val)
+    motor_right, motor_left = Get_Motor_Values(x_val, y_val)
+
+    motor_right=str(motor_right)
+    motor_left=str(motor_left)
     
-    message1=str(motor1)
-    message2=str(motor2)
+    oled.fill(0)
+    oled.text("right: " + motor_right,0,0)
+    oled.text("left:  " + motor_left,0,8)
+    oled.show()
     
-    message = message1 + "," + message2
-    uart.write(message) # Send message to the receiver
+    uart.write(motor_right + "," + motor_left) # Send message to the receiver
 
     sleep_us(delay_val_1)
