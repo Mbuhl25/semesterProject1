@@ -23,10 +23,18 @@ if __name__ == "__main__":
         if uart.any(): # Check if data is available to read
             data = uart.read() # Read the incoming data
             if data:
+                if data.decode('utf-8') == "0":
+                    print(data.decode('utf-8'))
+                    stepper.stop("left")
+                    stepper.stop("right")
+                    print("Killed")
+                    break
+                
                 parts = data.decode('utf-8').split(",")
                 new_step_left=float(parts[1])
                 new_step_right=float(parts[0])
-                print(new_step_right)
+                print(parts)
+                
         
         acc_left += new_step_left
         acc_right += new_step_right
@@ -51,4 +59,4 @@ if __name__ == "__main__":
             stepper.turnRightWheel(-1)
             acc_right += 1
         
-        sleep_us(50)
+        sleep_us(100)
