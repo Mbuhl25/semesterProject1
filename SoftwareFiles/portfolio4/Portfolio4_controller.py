@@ -4,7 +4,7 @@ import ssd1306
 
 #Variables for the script
 delay_val_1 = 50000
-minLimitValue = 0.05
+minLimitValue = 0.025
 
 # Joystick connected to:
 #  - X axis → GP26 (ADC0)
@@ -43,6 +43,8 @@ def Get_Motor_Values(x_val, y_val):
         motor_left = 0
     if abs(motor_right) < minLimitValue:
         motor_right = 0
+        
+    print(motor_left,motor_right)
     
     return motor_left*0.5, motor_right*0.5
     
