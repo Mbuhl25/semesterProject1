@@ -18,7 +18,7 @@ if __name__ == "__main__":
     acc_right = 0
 
     #Initialize the pController and Sensor
-    pControl = pController(1.0)
+    pControl = pController()
     sensor1 = Sensor()
 
     

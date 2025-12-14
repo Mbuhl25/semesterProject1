@@ -2,13 +2,13 @@
 from machine import Pin, ADC, PWM
 
 class pController():
-    def __init__(self, kp = 1.0):
+    def __init__(self, kp = 1.2):
         
         #The position of each sensor
         self.positions = [-4,-3, -2, -1, 1, 2, 3,4]
         
         #The wegiht of each sensor. 
-        self.weights = [1, 1, 1, 1, 1, 1, 1,1]
+        self.weights = [1.010356,0.902633,0.694541,0.277195,0.293000,0.800000,0.784541,1.138563]
         
         #The P constant for P control
         self.kp = kp
