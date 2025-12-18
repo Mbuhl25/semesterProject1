@@ -67,8 +67,8 @@ class Grapper:
         self.servo.duty_u16(0)
 
 if __name__ == "__main__":
-    grapper = Grapper([8,9,10,11], 12)
-    grapper.move_stepper(200, direction =1)
-    grapper.set_angle(-20)
+    grapper = Grapper([8,9,10,11], 18)
+    #grapper.move_stepper(200, direction =1)
+    grapper.set_angle(0)
     sleep(1)
     grapper.servo_stop()

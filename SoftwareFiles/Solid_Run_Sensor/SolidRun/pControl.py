@@ -8,7 +8,7 @@ class pController():
         self.positions = [-4,-3, -2, -1, 1, 2, 3,4]
         
         #The wegiht of each sensor. 
-        self.weights = [1.010356,0.902633,0.694541,0.277195,0.293000,0.800000,0.784541,1.138563]
+        self.weights = [1.110,0.903,0.695,0.277,0.293,0.800,0.785,1.239]
         
         #The P constant for P control
         self.kp = kp
