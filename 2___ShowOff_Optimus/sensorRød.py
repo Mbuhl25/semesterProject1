@@ -2,7 +2,7 @@
 from machine import Pin, ADC
 import asyncio
 from time import sleep
-
+from init import averageList, norm
 
 
 #Sort GPIO 8
@@ -17,20 +17,21 @@ class Sensor():
         self.adc_input = ADC(Pin(a0))
         self.current_adc = []
         self.sensor = [(0,0,0),
-                       (0,0,1),
-                       (1,0,0),
-                       (0,1,0),
-                       (1,1,0),
-                       (1,1,1)]
+                    (0,0,1),
+                    (1,0,0),
+                    (0,1,0),
+                    (1,1,0),
+                    (1,1,1)]
         
-        self.sensor8 = [(0,1,1),
-                       (1,1,1),
-                       (1,0,1),
-                       (0,0,1),
-                       (1,0,0),
-                       (0,1,0),
-                       (0,0,0),
-                       (1,1,0)]
+        self.sensor8 = [
+                    (0,1,1),
+                    (1,1,1),
+                    (1,0,1),
+                        (0,0,1),
+                        (1,0,0),
+                        (0,1,0),
+                        (0,0,0),
+                        (1,1,0)]
         
         self.sensor_lookup = {
                             (1,0,1): 1,
@@ -59,7 +60,7 @@ class Sensor():
         for number_cal in range(number_calibrations):
             sensor_calibration = []
             sleep(0.2)
-            for number_Z_List in range(len(self.sensor8)):
+            for number_Z_List in range(len(self.sensor)):
                 self.zSetValue(number_Z_List)
                 adc_value = self.readAdc()
                 sensor_calibration.append(adc_value)
@@ -85,7 +86,7 @@ class Sensor():
         
         :return sensor: Int, A number of wich sensor is connected to that specefic row of the sequence.
         '''
-        sensor = self.sensor_lookup[(self.sensor8[row][0],self.sensor8[row][1],self.sensor8[row][2])]
+        sensor = self.sensor_lookup[(self.sensor[row][0],self.sensor[row][1],self.sensor[row][2])]
         #print(self.sensor[row][0],self.sensor[row][1],self.sensor[row][2])
         return sensor
         
@@ -102,7 +103,7 @@ class Sensor():
     
     def runSensorNorm(self, minList,maxList):
         self.current_adc = []
-        for number_Z_List in range(len(self.sensor8)):
+        for number_Z_List in range(len(self.sensor)):
             self.zSetValue(number_Z_List)
             adc_value = self.readAdc()
             self.current_adc.append(adc_value)
@@ -116,9 +117,10 @@ class Sensor():
             adc_value = self.readAdc()
             self.current_adc.append(adc_value)
         return self.current_adc
-    
+
 if __name__ == "__main__":
     sensor = Sensor()
     while True:
         print(sensor.runSensor())
         sleep(0.1)
+    

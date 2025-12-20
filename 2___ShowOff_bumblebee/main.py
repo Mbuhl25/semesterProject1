@@ -1,6 +1,7 @@
 #importing necessary libaries
 from machine import Pin, ADC, PWM
 from time import sleep_us
+import time
 from sensor import Sensor
 from pControl import pController
 from stepperdrive import StepperDrive
@@ -18,7 +19,9 @@ if __name__ == "__main__":
     acc_right = 0
 
     #Initialize the pController and Sensor
-    pControl = pController(1.0)
+    pControl = pController(1.5)
+    #pControl = pController(0.5)
+    
     sensor1 = Sensor()
 
     
@@ -26,7 +29,7 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 80
+    sensorDelay = 1
     
     while True:
         sensorTimout+=1
@@ -34,11 +37,11 @@ if __name__ == "__main__":
 
         if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-            sensorTimout = 0    
-    
+            sensorTimout = 0
+            
+        
         acc_left += new_step_left
         acc_right += new_step_right
-        
         
         if acc_left >=1:
             stepper.turnLeftWheel()

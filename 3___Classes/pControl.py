@@ -1,14 +1,14 @@
 # pController.py onsdag 11/19
-from machine import Pin, ADC, PWM
 
 class pController():
     def __init__(self, kp = 1.0):
         
         #The position of each sensor
-        self.positions = [-4,-3, -2, -1, 1, 2, 3,4]
+        self.positions = [-4,-3, -2, -1, 1, 2, 3, 4]
         
         #The wegiht of each sensor. 
-        self.weights = [1, 1, 1, 1, 1, 1, 1,1]
+        self.weights = [3,3.5,2,1,1,2,3.5,3]
+        #self.weights = [2.3,3,1,1,1,1,3,2.3]
         
         #The P constant for P control
         self.kp = kp
@@ -73,3 +73,4 @@ class pController():
         new_step_left = max(0, min(base_step, new_step_left))
         new_step_right = max(0, min(base_step,new_step_right))
         return new_step_left, new_step_right  
+

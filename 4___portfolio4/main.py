@@ -1,8 +1,6 @@
 #importing necessary libaries
 from machine import Pin, ADC, PWM, UART
 from time import sleep_us
-from sensor import Sensor
-from pControl import pController
 from stepperdrive import StepperDrive
 
 if __name__ == "__main__":

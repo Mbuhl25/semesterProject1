@@ -15,14 +15,13 @@ class Sensor():
         
         #Sensor sequence from left to right sensor
         self.sensor = [(1,0,1),
-                       (0,0,0),
-                       (0,0,1),
-                       (1,0,0),
-                       (0,1,0),
-                       (1,1,0),
-                       (1,1,1),
-                       (0,1,1)]
- 
+                    (0,0,0),
+                    (0,0,1),
+                    (1,0,0),
+                    (0,1,0),
+                    (1,1,0),
+                    (1,1,1),
+                    (0,1,1)]
         
     def zSetValue(self,row):
         '''
@@ -33,7 +32,6 @@ class Sensor():
         :type row: Int
         '''
         self.z0.value(self.sensor[row][0]), self.z1.value(self.sensor[row][1]), self.z2.value(self.sensor[row][2])
-
     
     def runSensor(self):
         '''
@@ -47,8 +45,9 @@ class Sensor():
             self.adc_value = self.adc_input.read_u16()
             self.current_adc_list.append(self.adc_value)
         return self.current_adc_list
-    
 
+
+# Print the values of the sensor for debuggin
 if __name__ == "__main__":
     sensor = Sensor()
     while True:

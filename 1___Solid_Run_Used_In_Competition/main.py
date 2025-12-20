@@ -1,6 +1,7 @@
 #importing necessary libaries
 from machine import Pin, ADC, PWM
 from time import sleep_us
+import time
 from sensor import Sensor
 from pControl import pController
 from stepperdrive import StepperDrive
@@ -9,7 +10,7 @@ if __name__ == "__main__":
     
     
     # Variable to change the pwm percentage from the main file
-    pwm_procent=0.4
+    pwm_procent=0.8
 
     # Initializes the right and left motor pins, and initializes the stepper
     stepper = StepperDrive([0,1,2,3],[4,5,6,7], pwm_procent)
@@ -18,7 +19,9 @@ if __name__ == "__main__":
     acc_right = 0
 
     #Initialize the pController and Sensor
-    pControl = pController(1.0)
+    pControl = pController(0.5)
+    #pControl = pController(0.5)
+    
     sensor1 = Sensor()
 
     
@@ -26,7 +29,7 @@ if __name__ == "__main__":
     sensorTimout = 0
     
     new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
-    sensorDelay = 10
+    sensorDelay = 50
     
     while True:
         sensorTimout+=1
@@ -35,10 +38,10 @@ if __name__ == "__main__":
         if sensorTimout > sensorDelay:
             new_step_right,new_step_left = pControl.adjustStep(1.0, sensor1.runSensor())
             sensorTimout = 0
+            
         
         acc_left += new_step_left
         acc_right += new_step_right
-        
         
         if acc_left >=1:
             stepper.turnLeftWheel()

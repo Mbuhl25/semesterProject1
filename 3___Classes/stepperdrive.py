@@ -1,5 +1,5 @@
 #stepperdrive.py onsdag 11/19
-from machine import Pin, ADC, PWM
+from machine import Pin, PWM
 
 class StepperDrive:
     def __init__(self, left_pins, right_pins, pwm_pct=0.2, frequency=18000):
@@ -11,7 +11,7 @@ class StepperDrive:
         # Save pins
         self.left_pins_nums = left_pins
         self.right_pins_nums = right_pins
-
+        
         # Convert GPIO pins to PWM objects
         self.left_pins = self.initialize_pins(left_pins)
         self.right_pins = self.initialize_pins(right_pins)
@@ -22,8 +22,6 @@ class StepperDrive:
         
         #Half step
         self.half_seq = self.half_step()
-        
-        
 
     def initialize_pins(self, pins):
         
@@ -63,7 +61,7 @@ class StepperDrive:
         '''
         for i, pwm_pin in enumerate(pwm_list):
             pwm_pin.duty_u16(int(seq[i]))
-            
+
     def half_step(self):
         
         '''
@@ -73,16 +71,16 @@ class StepperDrive:
         :return seq: The sequence of the half step
         '''
         d = self.get_duty()
+        
+
         seq = [
-               [d,0,0,0],
-               [d,d,0,0],
-               [0,d,0,0],
-               [0,d,d,0],
-               [0,0,d,0],
-               [0,0,d,d],
-               [0,0,0,d],
-               [d,0,0,d],
-               ]
+            [d,0,0,0],
+            [0,d,0,0],
+            [0,d,d,0],
+            [0,0,d,0],
+            [0,0,0,d],
+            [d,0,0,d]
+            ]
         return seq
     
     def stop(self, side):
@@ -100,7 +98,7 @@ class StepperDrive:
         Uses this function to turn the left wheel with the given sequence.
         We only move one step of the sequence and saves the index we got to.
         '''
-    
+        
         self.set_duty(self.left_pins, self.half_seq[self.left_seq_index])
         self.left_seq_index = (self.left_seq_index + direction) % len(self.half_seq)
 
@@ -108,10 +106,7 @@ class StepperDrive:
         '''
         Uses this function to turn the right wheel with the given sequence.
         We only move one step of the sequence and saves the index we got to.
-        
         '''
-        #sleep_us(100)
         
         self.set_duty(self.right_pins, self.half_seq[self.right_seq_index])
         self.right_seq_index = (self.right_seq_index + direction) % len(self.half_seq)
-
