@@ -1,0 +1,1 @@
+For the python enviroment we choose to use poetry, because it is a reliable enviroment that can easily be shared and installed across devices
