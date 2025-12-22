@@ -30,7 +30,7 @@ colormap_ax.set_label('Number of successful Laps')
 
 colormap_ax = fig.colorbar(colormap_ax)
 colormap_ax.set_ticks([6, 7, 8, 9, 10])
-
+colormap_ax.set_label('Number of successful Laps')
 plt.legend()
 
 

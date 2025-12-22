@@ -116,7 +116,6 @@ class Roboticmovements:
         
         
         for i in range(int(steps_turn_degree)):
-               
             self.robot.turnWheel(self.leftseq, "left", speed, -direction)
             self.robot.turnWheel(self.leftseq, "right", speed, direction)
         self.robot.stop()
