@@ -2,7 +2,7 @@
 #include <chrono>
 
 int main() {
-    const long iterations = 1000000000; // 1 milliard og 100 mio iterationer
+    const long iterations = 1000000000; // 1 milliard, 100 mio, 10 mio iterationer
     long sum = 0;
 
     auto start = std::chrono::high_resolution_clock::now();

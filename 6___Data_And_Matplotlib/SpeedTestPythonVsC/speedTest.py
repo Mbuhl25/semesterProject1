@@ -1,6 +1,6 @@
 import time
 
-iterations = 1000000000  # 1 mia and 100 million iterationer
+iterations = 1000000000  # 1 milliard, 100 mio, 10 mio iterationer
 sum = 0
 
 start = time.perf_counter()  # starttid i sekunder med høj opløsning
