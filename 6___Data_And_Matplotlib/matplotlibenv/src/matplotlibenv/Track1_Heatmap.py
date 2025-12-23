@@ -11,12 +11,12 @@ DATA_SUCCESS = np.array([
     [5, 0, 0, 0]
 ])
 DATA_LAPTIME = np.array([
-    ['0s','0s','0s','0s'],
-    ['12.42s','10.57s','10.43s','0s'],
+    ['DNF','DNF','DNF','DNF'],
+    ['12.42s','10.57s','10.43s','DNF'],
     ['12.67s','10.61s','10.70s','11.08s'],
-    ['12.95s','11s','0s','0s'],
-    ['14s','11.57s','0s','0s'],
-    ['13.11s','0s','0s','0s'],
+    ['12.95s','11s','DNF','DNF'],
+    ['14s','11.57s','DNF','DNF'],
+    ['13.11s','DNF','DNF','DNF'],
 ])
 
 # Creating a subplot, so we can add advanced figures
